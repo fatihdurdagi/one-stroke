@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tek_dokunus/models/drawing_result.dart';
+import 'package:one_stroke/models/drawing_result.dart';
 
 class DrawingModel {
   const DrawingModel({

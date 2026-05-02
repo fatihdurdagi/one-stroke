@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:tek_dokunus/models/drawing_result.dart';
 
 class UserDrawing {
   const UserDrawing({
@@ -10,20 +9,17 @@ class UserDrawing {
     required this.drawingTime,
     required this.color,
     required this.createdAt,
-    required this.result,
+    required this.strokeLength,
+    required this.score,
   });
 
-  final File           imageFile;
-  final List<Offset?>  points;
-  final int            drawingTime;
-  final Color          color;
-  final DateTime       createdAt;
-  final DrawingResult  result;
-
-  // Convenience getters (keep backward-compatible names)
-  double get strokeLength => result.strokeLength;
-  double get score        => result.score.toDouble();
-  double get fluency      => result.fluency;
+  final File imageFile;
+  final List<Offset?> points;
+  final int drawingTime;
+  final Color color;
+  final DateTime createdAt;
+  final double strokeLength;
+  final double score;
 }
 
 class UserDrawingStore {

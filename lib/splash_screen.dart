@@ -1,7 +1,6 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:tek_dokunus/welcome_page.dart';
+import 'dart:async';
+import 'welcome_page.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -11,15 +10,14 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+
   @override
   void initState() {
     super.initState();
+
     Timer(
-      const Duration(milliseconds: 1400),
+      const Duration(seconds: 2),
       () {
-        if (!mounted) {
-          return;
-        }
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -32,52 +30,34 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  center: Alignment.center,
-                  radius: 0.95,
-                  colors: [
-                    Colors.white.withValues(alpha: 0.08),
-                    Colors.black,
-                  ],
-                ),
+
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+
+            const Icon(
+              Icons.gesture,
+              color: Colors.white,
+              size: 80,
+            ),
+
+            const SizedBox(height: 20),
+
+            const Text(
+              "TekDokunuş",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
               ),
             ),
-          ),
-          const Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.gesture_rounded, color: Colors.white, size: 56),
-                SizedBox(height: 18),
-                Text(
-                  'OneStroke',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 32,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 8,
-                  ),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'Minimal hareket sanat stüdyosu',
-                  style: TextStyle(
-                    color: Color(0xFF9B9B9B),
-                    fontSize: 13,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+
+          ],
+        ),
       ),
     );
   }

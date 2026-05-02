@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:tek_dokunus/app_colors.dart';
-import 'package:tek_dokunus/models/comment_model.dart';
-import 'package:tek_dokunus/models/drawing_result.dart';
-import 'package:tek_dokunus/user_profile_page.dart';
+import 'package:one_stroke/app_colors.dart';
+import 'package:one_stroke/models/comment_model.dart';
+import 'package:one_stroke/models/drawing_result.dart';
+import 'package:one_stroke/user_profile_page.dart';
 
 // ── Local data model ──────────────────────────────────────────────────────────
 

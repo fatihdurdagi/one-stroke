@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tek_dokunus/main.dart';
+import 'package:one_stroke/main.dart';
 
 void main() {
   testWidgets('shows DRIP splash branding', (tester) async {

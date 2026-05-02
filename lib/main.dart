@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tek_dokunus/splash_screen.dart';
+import 'package:one_stroke/splash_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

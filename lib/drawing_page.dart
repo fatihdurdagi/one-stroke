@@ -5,8 +5,8 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:tek_dokunus/models/drawing_result.dart';
-import 'package:tek_dokunus/preview_page.dart';
+import 'package:one_stroke/models/drawing_result.dart';
+import 'package:one_stroke/preview_page.dart';
 
 class DrawingPage extends StatefulWidget {
   const DrawingPage({super.key});

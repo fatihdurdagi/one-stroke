@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tek_dokunus/drawing_page.dart';
+import 'package:one_stroke/drawing_page.dart';
 
 // ── Entry banner (shown in feed tab) ─────────────────────────────────────────
 

@@ -1,16 +1,20 @@
-import 'dart:io';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:tek_dokunus/akis_page.dart';
-import 'package:tek_dokunus/challenge_page.dart';
-import 'package:tek_dokunus/drawing_page.dart';
-import 'package:tek_dokunus/user_drawing_store.dart';
+import 'package:one_stroke/drawing_page.dart';
+import 'package:one_stroke/user_drawing_store.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key, this.initialTab = 0});
 
   final int initialTab;
+
+  static const Color bg = Color(0xFF050505);
+  static const Color surface = Color(0xFF111111);
+  static const Color surfaceSoft = Color(0xFF1B1B1B);
+  static const Color surfaceCard = Color(0xFF2A2A2A);
+  static const Color soft = Color(0xFF9C9C9C);
+  static const Color text = Color(0xFFF2F2F2);
+  static const Color line = Color(0xFF303030);
 
   @override
   State<WelcomePage> createState() => _WelcomePageState();
@@ -19,417 +23,875 @@ class WelcomePage extends StatefulWidget {
 class _WelcomePageState extends State<WelcomePage> {
   late int _selectedIndex;
 
-  static const List<_FeedPostData> _posts = [
-    _FeedPostData(
-      author: 'shu.aether',
-      likes: '1.3K',
-      comments: '48',
-      style: _ArtworkStyle.mountain,
-    ),
-    _FeedPostData(
-      author: 'drip.by.zen',
-      likes: '402',
-      comments: '19',
-      style: _ArtworkStyle.wave,
-    ),
-    _FeedPostData(
-      author: 'void.sketches',
-      likes: '2K',
-      comments: '124',
-      style: _ArtworkStyle.heart,
-    ),
-  ];
-
   @override
   void initState() {
     super.initState();
     _selectedIndex = widget.initialTab;
   }
 
+  static const List<_InsightItem> _insights = [
+    _InsightItem(label: 'Bugun', value: '18 cizim'),
+    _InsightItem(label: 'En iyi skor', value: '96/100'),
+    _InsightItem(label: 'Ortalama sure', value: '1.3 sn'),
+  ];
+
+  static const List<_ChallengeCardData> _cards = [
+    _ChallengeCardData(
+      category: 'Editor secimi',
+      title: 'Tek hamlede dengeli hareket',
+      description: 'Kavis, hiz ve bitis dogrulugunu ayni akista test eden gunun ana calismasi.',
+      metric: 'Zorluk orta',
+      duration: '45 sn',
+      color: Color(0xFF303030),
+    ),
+    _ChallengeCardData(
+      category: 'Canli analiz',
+      title: 'Skorunu tekrar oynatmayla incele',
+      description: 'Cizimi bitirdigin an hizini, akiciligi ve cizgi uzunlugunu tek ekranda gor.',
+      metric: 'Analiz hazir',
+      duration: 'Aninda',
+      color: Color(0xFF262626),
+    ),
+    _ChallengeCardData(
+      category: 'Gunluk seri',
+      title: 'Ritmini bozmadan 3 gorev tamamla',
+      description: 'Ardisik gorevlerle refleksini sabit tut, daha temiz bitisler uret.',
+      metric: '3 adim',
+      duration: '2 dk',
+      color: Color(0xFF383838),
+    ),
+  ];
+
+  static const List<_FeedPostData> _posts = [
+    _FeedPostData(
+      author: 'deniz.ciziyor',
+      timeLabel: '4 dk once',
+      title: 'Tek hamlede lotus cizimi',
+      caption: 'Tek cizgide tamamladim. Akicilik puani bekledigimden iyi geldi.',
+      likes: '1.284',
+      comments: '126',
+      saves: '84',
+      color: Color(0xFF2C2C2C),
+    ),
+    _FeedPostData(
+      author: 'iz.akisi',
+      timeLabel: '11 dk once',
+      title: 'Dairesel refleks denemesi',
+      caption: 'Hizi dusurup bitis hassasiyetine odaklandim. Cok daha temiz oldu.',
+      likes: '982',
+      comments: '74',
+      saves: '51',
+      color: Color(0xFF242424),
+    ),
+    _FeedPostData(
+      author: 'studio.tekdokunus',
+      timeLabel: '26 dk once',
+      title: 'Gunluk meydan okuma',
+      caption: 'Bugunun gorevi: cizgiyi bozmadan tek nefeste finale ulas.',
+      likes: '2.104',
+      comments: '201',
+      saves: '140',
+      color: Color(0xFF343434),
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF090909),
+      backgroundColor: WelcomePage.bg,
       body: SafeArea(
         child: IndexedStack(
           index: _selectedIndex,
           children: [
+            _buildHomeTab(context),
             _buildFeedTab(),
-            const AkisPage(),
+            _buildMyDrawingsTab(),
             _buildProfileTab(),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => const DrawingPage()),
-          );
-        },
-        child: const Icon(Icons.edit_outlined),
-      ),
-      bottomNavigationBar: SafeArea(
-        top: false,
-        child: Container(
-          height: 62,
-          decoration: const BoxDecoration(
-            color: Color(0xFF111111),
-            border: Border(top: BorderSide(color: Color(0xFF232323))),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _BottomNavIcon(
-                icon: Icons.home_filled,
-                active: _selectedIndex == 0,
-                onTap: () => setState(() => _selectedIndex = 0),
-              ),
-              _BottomNavIcon(
-                icon: Icons.explore_rounded,
-                active: _selectedIndex == 1,
-                onTap: () => setState(() => _selectedIndex = 1),
-              ),
-              _BottomNavIcon(
-                icon: Icons.person_rounded,
-                active: _selectedIndex == 2,
-                onTap: () => setState(() => _selectedIndex = 2),
-              ),
-            ],
-          ),
+      bottomNavigationBar: Container(
+        height: 84,
+        padding: const EdgeInsets.fromLTRB(18, 10, 18, 18),
+        decoration: const BoxDecoration(
+          color: WelcomePage.surface,
+          border: Border(top: BorderSide(color: WelcomePage.line)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _NavItem(
+              icon: Icons.dashboard_rounded,
+              active: _selectedIndex == 0,
+              onTap: () => setState(() => _selectedIndex = 0),
+            ),
+            _NavItem(
+              icon: Icons.dynamic_feed_rounded,
+              active: _selectedIndex == 1,
+              onTap: () => setState(() => _selectedIndex = 1),
+            ),
+            _NavItem(
+              icon: Icons.gesture_rounded,
+              active: _selectedIndex == 2,
+              onTap: () => setState(() => _selectedIndex = 2),
+            ),
+            _NavItem(
+              icon: Icons.person_outline_rounded,
+              active: _selectedIndex == 3,
+              onTap: () => setState(() => _selectedIndex = 3),
+            ),
+          ],
         ),
       ),
     );
   }
 
+  Widget _buildHomeTab(BuildContext context) {
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const _Header(),
+                const SizedBox(height: 24),
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(28),
+                    color: WelcomePage.surface,
+                    border: Border.all(color: WelcomePage.line),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x66000000),
+                        blurRadius: 20,
+                        offset: Offset(0, 12),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Bugunun odagi',
+                        style: TextStyle(color: WelcomePage.soft, fontSize: 13),
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        'Ciz, olc, tekrar oynat.',
+                        style: TextStyle(
+                          color: WelcomePage.text,
+                          fontSize: 30,
+                          height: 1.05,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.8,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      const Text(
+                        'Acilis ekrani sade siyah ve gri yuzeylerle yeniden duzenlendi.',
+                        style: TextStyle(color: Color(0xFFC7C7C7), height: 1.45),
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const DrawingPage(),
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFD9D9D9),
+                                foregroundColor: Colors.black,
+                                elevation: 0,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(18),
+                                ),
+                              ),
+                              icon: const Icon(Icons.play_arrow_rounded),
+                              label: const Text(
+                                'Cizime Basla',
+                                style: TextStyle(fontWeight: FontWeight.w700),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(18),
+                              color: WelcomePage.surfaceSoft,
+                              border: Border.all(color: WelcomePage.line),
+                            ),
+                            child: const Icon(Icons.tune_rounded, color: WelcomePage.text),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  'Anlik ozet',
+                  style: TextStyle(
+                    color: WelcomePage.text,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: _insights
+                      .map(
+                        (item) => Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.only(right: item == _insights.last ? 0 : 10),
+                            child: _InsightCard(item: item),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
+                const SizedBox(height: 28),
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'One cikan akislar',
+                      style: TextStyle(
+                        color: WelcomePage.text,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Text(
+                      'Tumunu gor',
+                      style: TextStyle(
+                        color: WelcomePage.text,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+              ],
+            ),
+          ),
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          sliver: SliverList.builder(
+            itemCount: _cards.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: _ChallengeCard(
+                  data: _cards[index],
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const DrawingPage(),
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
+          ),
+        ),
+        const SliverToBoxAdapter(child: SizedBox(height: 100)),
+      ],
+    );
+  }
+
   Widget _buildFeedTab() {
+    return CustomScrollView(
+      slivers: [
+        const SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(20, 12, 20, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _Header(),
+                SizedBox(height: 24),
+                Text(
+                  'Akis',
+                  style: TextStyle(
+                    color: WelcomePage.text,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Toplulugun son cizimlerini kaydir, begen, yorumla ve kaydet.',
+                  style: TextStyle(color: WelcomePage.soft, height: 1.4),
+                ),
+                SizedBox(height: 18),
+              ],
+            ),
+          ),
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          sliver: SliverList.builder(
+            itemCount: _posts.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 18),
+                child: _FeedPost(post: _posts[index]),
+              );
+            },
+          ),
+        ),
+        const SliverToBoxAdapter(child: SizedBox(height: 100)),
+      ],
+    );
+  }
+
+  Widget _buildMyDrawingsTab() {
     return ValueListenableBuilder<List<UserDrawing>>(
       valueListenable: UserDrawingStore.drawings,
       builder: (context, drawings, child) {
-        return ListView(
-          padding: const EdgeInsets.fromLTRB(18, 12, 18, 120),
-          children: [
-            const _TopBar(),
-            const SizedBox(height: 18),
-            const WeeklyChallengeBanner(),
-            if (drawings.isNotEmpty) ...[
-              const _SectionTitle(
-                title: 'GÖNDERİLERİNİZ',
-                subtitle: 'Stüdyonuzdaki son tek darbe çizimleriniz.',
+        if (drawings.isEmpty) {
+          return _buildPlaceholderTab('Henuz bir cizimin yok. Bir cizim tamamlayinca burada goreceksin.');
+        }
+
+        return CustomScrollView(
+          slivers: [
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(20, 12, 20, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _Header(),
+                    SizedBox(height: 24),
+                    Text(
+                      'Cizimlerim',
+                      style: TextStyle(
+                        color: WelcomePage.text,
+                        fontSize: 28,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Tamamladigin cizimler burada saklanir.',
+                      style: TextStyle(color: WelcomePage.soft, height: 1.4),
+                    ),
+                    SizedBox(height: 18),
+                  ],
+                ),
               ),
-              const SizedBox(height: 14),
-              for (final drawing in drawings) ...[
-                _UserPostCard(drawing: drawing),
-                const SizedBox(height: 18),
-              ],
-            ],
-            const _SectionTitle(
-              title: 'AKIŞ',
-              subtitle: 'Topluluktan minimal monokrom ilham.',
             ),
-            const SizedBox(height: 14),
-            for (final post in _posts) ...[
-              _FeedCard(post: post),
-              const SizedBox(height: 18),
-            ],
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              sliver: SliverList.builder(
+                itemCount: drawings.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 18),
+                    child: _MyDrawingCard(drawing: drawings[index]),
+                  );
+                },
+              ),
+            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 100)),
           ],
         );
       },
     );
   }
+
 
   Widget _buildProfileTab() {
     return ValueListenableBuilder<List<UserDrawing>>(
       valueListenable: UserDrawingStore.drawings,
       builder: (context, drawings, child) {
         final totalDrawings = drawings.length;
-        final totalLikes = drawings.fold<int>(
-          3200,
-          (sum, drawing) => sum + drawing.score.round() * 2,
-        );
+        final totalLikes = drawings.fold<int>(0, (sum, drawing) {
+          return sum + (drawing.score * 1.8).round() + 12;
+        });
+        final totalXp = drawings.fold<int>(0, (sum, drawing) {
+          return sum + drawing.score.round() * 8 + 40;
+        });
+        final level = totalXp == 0 ? 1 : (totalXp ~/ 250) + 1;
+        final currentLevelXp = totalXp % 250;
+        final progress = totalXp == 0 ? 0.0 : currentLevelXp / 250;
+        final followers = 128 + totalLikes;
+        final following = 42 + (totalDrawings * 3);
 
         return CustomScrollView(
           slivers: [
-            const SliverToBoxAdapter(child: _TopBar()),
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(18, 18, 18, 0),
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const _Header(),
+                    const SizedBox(height: 24),
                     Container(
-                      width: 84,
-                      height: 84,
+                      padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 1.2),
-                        color: const Color(0xFF131313),
+                        color: WelcomePage.surface,
+                        borderRadius: BorderRadius.circular(28),
+                        border: Border.all(color: WelcomePage.line),
                       ),
-                      child: const Icon(
-                        Icons.person_rounded,
-                        color: Colors.white,
-                        size: 38,
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                width: 84,
+                                height: 84,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: WelcomePage.surfaceCard,
+                                  border: Border.all(color: WelcomePage.line, width: 2),
+                                ),
+                                child: const Icon(Icons.person_rounded, color: WelcomePage.text, size: 40),
+                              ),
+                              const SizedBox(width: 18),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'tekdokunus.user',
+                                      style: TextStyle(
+                                        color: WelcomePage.text,
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    const Text(
+                                      'Tek cizgide ritim, hassasiyet ve hiz calisan profil.',
+                                      style: TextStyle(color: WelcomePage.soft, height: 1.4),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    _Badge(label: 'Level '),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            children: [
+                              Expanded(child: _StatCard(label: 'Takipci', value: '$followers')),
+                              const SizedBox(width: 10),
+                              Expanded(child: _StatCard(label: 'Takip', value: '$following')),
+                              const SizedBox(width: 10),
+                              Expanded(child: _StatCard(label: 'Cizim', value: '$totalDrawings')),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Expanded(child: _StatCard(label: 'Toplam begeni', value: '$totalLikes')),
+                              const SizedBox(width: 10),
+                              Expanded(child: _StatCard(label: 'Toplam XP', value: '$totalXp')),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: WelcomePage.surfaceSoft,
+                              borderRadius: BorderRadius.circular(22),
+                              border: Border.all(color: WelcomePage.line),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Level $level ilerleme',
+                                      style: const TextStyle(color: WelcomePage.text, fontWeight: FontWeight.w700),
+                                    ),
+                                    Text(
+                                      '$currentLevelXp / 250 XP',
+                                      style: const TextStyle(color: WelcomePage.soft),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(999),
+                                  child: LinearProgressIndicator(
+                                    value: progress,
+                                    minHeight: 10,
+                                    backgroundColor: WelcomePage.surfaceCard,
+                                    valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFD9D9D9)),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 24),
                     const Text(
-                      '@artist_name',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w900,
-                      ),
+                      'Profil ozetin',
+                      style: TextStyle(color: WelcomePage.text, fontSize: 20, fontWeight: FontWeight.w700),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 12),
                     const Text(
-                      'DİJİTAL MİNİMALİST  ·  İSTANBUL',
-                      style: TextStyle(
-                        color: Color(0xFFA0A0A0),
-                        fontSize: 11,
-                        letterSpacing: 1.1,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF151515),
-                        borderRadius: BorderRadius.circular(999),
-                        border: Border.all(color: const Color(0xFF2A2A2A)),
-                      ),
-                      child: const Text(
-                        'SEVİYE 2',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 11,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 22),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _ProfileStat(
-                            value: '$totalDrawings',
-                            label: 'ÇİZİM',
-                          ),
-                        ),
-                        Expanded(
-                          child: _ProfileStat(
-                            value: '${(totalLikes / 1000).toStringAsFixed(1)}B',
-                            label: 'TAKİPÇİ',
-                          ),
-                        ),
-                        const Expanded(
-                          child: _ProfileStat(
-                            value: '42',
-                            label: 'TAKİP',
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 22),
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _ProfileTabLabel(label: 'AKIŞ', active: true),
-                        _ProfileTabLabel(label: 'ARŞİV'),
-                        _ProfileTabLabel(label: 'BEĞENDİKLERİM'),
-                      ],
+                      'Level ve toplam begeni degerleri kendi cizim performansina ve gorev skorlarina gore otomatik hesaplanir.',
+                      style: TextStyle(color: WelcomePage.soft, height: 1.45),
                     ),
                   ],
                 ),
               ),
             ),
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(18, 18, 18, 120),
-              sliver: drawings.isEmpty
-                  ? const SliverToBoxAdapter(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 48),
-                        child: Center(
-                          child: Text(
-                            'Henüz çizim yok',
-                            style: TextStyle(
-                              color: Color(0xFF6A6A6A),
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
-                  : SliverGrid.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        mainAxisSpacing: 2,
-                        crossAxisSpacing: 2,
-                        childAspectRatio: 0.92,
-                      ),
-                      itemCount: drawings.length,
-                      itemBuilder: (context, index) => _ProfileUserTile(
-                        imageFile: drawings[index].imageFile,
-                      ),
-                    ),
-            ),
+            if (drawings.isNotEmpty)
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(20, 18, 20, 100),
+                sliver: SliverGrid(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) => _ProfileDrawingTile(drawing: drawings[index]),
+                    childCount: drawings.length,
+                  ),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 0.9,
+                  ),
+                ),
+              )
+            else
+              const SliverToBoxAdapter(child: SizedBox(height: 100)),
           ],
         );
       },
     );
   }
+  Widget _buildPlaceholderTab(String text) {
+    return Center(
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 24),
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: WelcomePage.surface,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: WelcomePage.line),
+        ),
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: WelcomePage.text, fontSize: 16),
+        ),
+      ),
+    );
+  }
 }
 
-class _TopBar extends StatelessWidget {
-  const _TopBar();
+class _Header extends StatelessWidget {
+  const _Header();
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const _ChromeIcon(icon: Icons.menu_rounded),
-        const Spacer(),
-        const Text(
-          'OneStroke',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 2.0,
+        Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            color: WelcomePage.surfaceSoft,
+            border: Border.all(color: WelcomePage.line),
+          ),
+          child: const Icon(Icons.gesture_rounded, color: WelcomePage.text),
+        ),
+        const SizedBox(width: 12),
+        const Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'TekDokunus',
+                style: TextStyle(
+                  color: WelcomePage.text,
+                  fontSize: 26,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.4,
+                ),
+              ),
+              SizedBox(height: 2),
+              Text(
+                'Hareket odakli cizim akisi',
+                style: TextStyle(color: WelcomePage.soft, fontSize: 13),
+              ),
+            ],
           ),
         ),
-        const Spacer(),
-        const _ChromeIcon(icon: Icons.account_circle_outlined),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(999),
+            color: WelcomePage.surface,
+            border: Border.all(color: WelcomePage.line),
+          ),
+          child: const Text(
+            'PRO',
+            style: TextStyle(
+              color: WelcomePage.text,
+              fontWeight: FontWeight.w700,
+              fontSize: 12,
+            ),
+          ),
+        ),
       ],
     );
   }
 }
 
-class _ChromeIcon extends StatelessWidget {
-  const _ChromeIcon({required this.icon});
+class _InsightCard extends StatelessWidget {
+  const _InsightCard({required this.item});
 
-  final IconData icon;
+  final _InsightItem item;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 34,
-      height: 34,
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFF151515),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF292929)),
+        color: WelcomePage.surfaceSoft,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: WelcomePage.line),
       ),
-      child: Icon(icon, color: Colors.white, size: 17),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(item.label, style: const TextStyle(color: WelcomePage.soft, fontSize: 12)),
+          const SizedBox(height: 8),
+          Text(
+            item.value,
+            style: const TextStyle(
+              color: WelcomePage.text,
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
-class _SectionTitle extends StatelessWidget {
-  const _SectionTitle({
-    required this.title,
-    required this.subtitle,
-  });
+class _ChallengeCard extends StatelessWidget {
+  const _ChallengeCard({required this.data, required this.onTap});
 
-  final String title;
-  final String subtitle;
+  final _ChallengeCardData data;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 28,
-            fontWeight: FontWeight.w900,
-            letterSpacing: -0.6,
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28),
+        color: data.color,
+        border: Border.all(color: WelcomePage.line),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x55000000),
+            blurRadius: 18,
+            offset: Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(28),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(22),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(999),
+                        color: Colors.black26,
+                      ),
+                      child: Text(
+                        data.category,
+                        style: const TextStyle(
+                          color: WelcomePage.text,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
+                    const Icon(Icons.north_east_rounded, color: Colors.white70),
+                  ],
+                ),
+                const SizedBox(height: 48),
+                Text(
+                  data.title,
+                  style: const TextStyle(
+                    color: WelcomePage.text,
+                    fontSize: 28,
+                    height: 1.05,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.8,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  data.description,
+                  style: const TextStyle(color: Color(0xFFD0D0D0), height: 1.45),
+                ),
+                const SizedBox(height: 18),
+                Row(
+                  children: [
+                    _MetaChip(icon: Icons.timeline_rounded, label: data.metric),
+                    const SizedBox(width: 10),
+                    _MetaChip(icon: Icons.schedule_rounded, label: data.duration),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
-        const SizedBox(height: 6),
-        Text(
-          subtitle,
-          style: const TextStyle(
-            color: Color(0xFF8F8F8F),
-            fontSize: 13,
-            height: 1.45,
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
 
-class _FeedCard extends StatelessWidget {
-  const _FeedCard({required this.post});
+class _FeedPost extends StatelessWidget {
+  const _FeedPost({required this.post});
 
   final _FeedPostData post;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8),
-          child: Text(
-            post.author,
-            style: const TextStyle(
-              color: Color(0xFFB0B0B0),
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-        Container(
-          width: double.infinity,
-          height: 260,
-          decoration: BoxDecoration(
-            color: const Color(0xFF070707),
-            borderRadius: BorderRadius.circular(2),
-            border: Border.all(color: const Color(0xFF191919)),
-          ),
-          child: CustomPaint(
-            painter: _ArtworkPainter(post.style),
-          ),
-        ),
-        const SizedBox(height: 10),
-        Row(
+    return Container(
+      decoration: BoxDecoration(
+        color: WelcomePage.surface,
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: WelcomePage.line),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(Icons.favorite_border_rounded,
-                color: Colors.white, size: 16),
-            const SizedBox(width: 5),
-            Text(
-              post.likes,
-              style: const TextStyle(color: Colors.white, fontSize: 11),
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 18,
+                  backgroundColor: WelcomePage.surfaceCard,
+                  child: const Icon(Icons.gesture_rounded, color: WelcomePage.text, size: 18),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        post.author,
+                        style: const TextStyle(
+                          color: WelcomePage.text,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      Text(
+                        post.timeLabel,
+                        style: const TextStyle(color: WelcomePage.soft, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.more_horiz_rounded, color: Colors.white70),
+              ],
             ),
-            const SizedBox(width: 14),
-            const Icon(Icons.chat_bubble_outline_rounded,
-                color: Colors.white, size: 14),
-            const SizedBox(width: 5),
-            Text(
-              post.comments,
-              style: const TextStyle(color: Colors.white, fontSize: 11),
+            const SizedBox(height: 16),
+            Container(
+              height: 260,
+              decoration: BoxDecoration(
+                color: post.color,
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Stack(
+                children: [
+                  const Positioned(
+                    top: 16,
+                    right: 16,
+                    child: Icon(Icons.open_in_full_rounded, color: Colors.white54),
+                  ),
+                  Positioned(
+                    left: 22,
+                    right: 22,
+                    bottom: 22,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          post.title,
+                          style: const TextStyle(
+                            color: WelcomePage.text,
+                            fontSize: 28,
+                            fontWeight: FontWeight.w800,
+                            height: 1.05,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          post.caption,
+                          style: const TextStyle(color: Color(0xFFD0D0D0), height: 1.45),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-            const Spacer(),
-            const Icon(Icons.bookmark_border_rounded,
-                color: Colors.white, size: 16),
+            const SizedBox(height: 14),
+            Row(
+              children: [
+                _ActionStat(icon: Icons.favorite_border_rounded, value: post.likes),
+                const SizedBox(width: 12),
+                _ActionStat(icon: Icons.mode_comment_outlined, value: post.comments),
+                const SizedBox(width: 12),
+                _ActionStat(icon: Icons.bookmark_border_rounded, value: post.saves),
+                const Spacer(),
+                const Icon(Icons.send_outlined, color: Colors.white70),
+              ],
+            ),
           ],
         ),
-      ],
+      ),
     );
   }
 }
 
-class _UserPostCard extends StatelessWidget {
-  const _UserPostCard({required this.drawing});
+class _MyDrawingCard extends StatelessWidget {
+  const _MyDrawingCard({required this.drawing});
 
   final UserDrawing drawing;
 
@@ -437,47 +899,134 @@ class _UserPostCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF111111),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFF242424)),
+        color: WelcomePage.surface,
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: WelcomePage.line),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'you',
-              style: TextStyle(
-                color: Color(0xFFB0B0B0),
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 18,
+                  backgroundColor: WelcomePage.surfaceCard,
+                  child: const Icon(Icons.brush_rounded, color: WelcomePage.text, size: 18),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Kendi cizimin',
+                    style: const TextStyle(
+                      color: WelcomePage.text,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                Text(
+                  _formatTime(drawing.createdAt),
+                  style: const TextStyle(color: WelcomePage.soft, fontSize: 12),
+                ),
+              ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 16),
             ClipRRect(
-              borderRadius: BorderRadius.circular(18),
-              child: SizedBox(
+              borderRadius: BorderRadius.circular(24),
+              child: Container(
                 height: 260,
+                color: const Color(0xFF202020),
                 width: double.infinity,
                 child: Image.file(
                   drawing.imageFile,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
-                    return Container(color: const Color(0xFF1A1A1A));
+                    return const Center(
+                      child: Text(
+                        'Onizleme yuklenemedi',
+                        style: TextStyle(color: WelcomePage.soft),
+                      ),
+                    );
                   },
                 ),
               ),
             ),
-            const SizedBox(height: 12),
-            Row(
+            const SizedBox(height: 14),
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
               children: [
-                _MetaText(value: '${drawing.score.toStringAsFixed(0)} puan'),
-                const SizedBox(width: 14),
-                _MetaText(value: '${drawing.strokeLength.toStringAsFixed(0)} px'),
-                const SizedBox(width: 14),
-                _MetaText(value: '${drawing.drawingTime} ms'),
+                _ActionStat(
+                  icon: Icons.timer_outlined,
+                  value: '${drawing.drawingTime} ms',
+                ),
+                _ActionStat(
+                  icon: Icons.straighten_rounded,
+                  value: '${drawing.strokeLength.toStringAsFixed(0)} px',
+                ),
+                _ActionStat(
+                  icon: Icons.star_border_rounded,
+                  value: '${drawing.score.toStringAsFixed(0)} / 100',
+                ),
               ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static String _formatTime(DateTime time) {
+    final hour = time.hour.toString().padLeft(2, '0');
+    final minute = time.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
+  }
+}
+
+
+class _ProfileDrawingTile extends StatelessWidget {
+  const _ProfileDrawingTile({required this.drawing});
+
+  final UserDrawing drawing;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: WelcomePage.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: WelcomePage.line),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.file(
+              drawing.imageFile,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(color: WelcomePage.surfaceCard);
+              },
+            ),
+            Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.transparent, Color(0xCC000000)],
+                ),
+              ),
+            ),
+            Positioned(
+              left: 12,
+              right: 12,
+              bottom: 12,
+              child: Text(
+                'Skor ${drawing.score.toStringAsFixed(0)}',
+                style: const TextStyle(color: WelcomePage.text, fontWeight: FontWeight.w700),
+              ),
             ),
           ],
         ),
@@ -486,56 +1035,123 @@ class _UserPostCard extends StatelessWidget {
   }
 }
 
+class _Badge extends StatelessWidget {
+  const _Badge({required this.label});
 
-class _MetaText extends StatelessWidget {
-  const _MetaText({required this.value});
+  final String label;
 
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: WelcomePage.surfaceSoft,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: WelcomePage.line),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(color: WelcomePage.text, fontWeight: FontWeight.w700),
+      ),
+    );
+  }
+}
+
+class _StatCard extends StatelessWidget {
+  const _StatCard({required this.label, required this.value});
+
+  final String label;
   final String value;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFF171717),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: const Color(0xFF2B2B2B)),
+        color: WelcomePage.surfaceSoft,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: WelcomePage.line),
       ),
-      child: Text(
-        value,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: const TextStyle(color: WelcomePage.soft, fontSize: 12)),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: const TextStyle(
+              color: WelcomePage.text,
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
       ),
     );
   }
 }
+class _ActionStat extends StatelessWidget {
+  const _ActionStat({required this.icon, required this.value});
 
-class _ProfileUserTile extends StatelessWidget {
-  const _ProfileUserTile({required this.imageFile});
-
-  final File imageFile;
+  final IconData icon;
+  final String value;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFF141414),
-      child: Image.file(
-        imageFile,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return const SizedBox.expand();
-        },
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: WelcomePage.surfaceSoft,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: WelcomePage.line),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 18, color: WelcomePage.text),
+          const SizedBox(width: 8),
+          Text(
+            value,
+            style: const TextStyle(color: WelcomePage.text, fontWeight: FontWeight.w700),
+          ),
+        ],
       ),
     );
   }
 }
 
+class _MetaChip extends StatelessWidget {
+  const _MetaChip({required this.icon, required this.label});
 
-class _BottomNavIcon extends StatelessWidget {
-  const _BottomNavIcon({
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(999),
+        color: const Color(0x22000000),
+        border: Border.all(color: const Color(0xFF3A3A3A)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: WelcomePage.text),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: const TextStyle(color: WelcomePage.text, fontWeight: FontWeight.w600),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NavItem extends StatelessWidget {
+  const _NavItem({
     required this.icon,
     required this.active,
     required this.onTap,
@@ -550,391 +1166,68 @@ class _BottomNavIcon extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 36,
-        height: 36,
+        width: 52,
+        height: 52,
         decoration: BoxDecoration(
-          color: active ? Colors.white : Colors.transparent,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(18),
+          color: active ? WelcomePage.surfaceCard : Colors.transparent,
         ),
         child: Icon(
           icon,
-          size: 18,
-          color: active ? Colors.black : Colors.white70,
+          color: active ? WelcomePage.text : Colors.white54,
         ),
       ),
     );
   }
 }
 
-class _ProfileStat extends StatelessWidget {
-  const _ProfileStat({
-    required this.value,
-    required this.label,
-  });
+class _InsightItem {
+  const _InsightItem({required this.label, required this.value});
 
+  final String label;
   final String value;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w900,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: const TextStyle(
-            color: Color(0xFF9A9A9A),
-            fontSize: 10,
-            letterSpacing: 1.1,
-          ),
-        ),
-      ],
-    );
-  }
 }
 
-class _ProfileTabLabel extends StatelessWidget {
-  const _ProfileTabLabel({
-    required this.label,
-    this.active = false,
+class _ChallengeCardData {
+  const _ChallengeCardData({
+    required this.category,
+    required this.title,
+    required this.description,
+    required this.metric,
+    required this.duration,
+    required this.color,
   });
 
-  final String label;
-  final bool active;
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      label,
-      style: TextStyle(
-        color: active ? Colors.white : const Color(0xFF838383),
-        fontSize: 11,
-        fontWeight: FontWeight.w800,
-        letterSpacing: 1.1,
-      ),
-    );
-  }
+  final String category;
+  final String title;
+  final String description;
+  final String metric;
+  final String duration;
+  final Color color;
 }
 
 class _FeedPostData {
   const _FeedPostData({
     required this.author,
+    required this.timeLabel,
+    required this.title,
+    required this.caption,
     required this.likes,
     required this.comments,
-    required this.style,
+    required this.saves,
+    required this.color,
   });
 
   final String author;
+  final String timeLabel;
+  final String title;
+  final String caption;
   final String likes;
   final String comments;
-  final _ArtworkStyle style;
+  final String saves;
+  final Color color;
 }
 
-enum _ArtworkStyle {
-  mountain,
-  wave,
-  heart,
-  portraitLeft,
-  portraitCenter,
-  portraitRight,
-  portraitFemale,
-  portraitShadow,
-  portraitSoft,
-  letterB,
-  numberSeven,
-  numberNine,
-}
 
-class _ArtworkPainter extends CustomPainter {
-  const _ArtworkPainter(this.style);
 
-  final _ArtworkStyle style;
 
-  @override
-  void paint(Canvas canvas, Size size) {
-    final background = Paint()..color = const Color(0xFF050505);
-    canvas.drawRect(Offset.zero & size, background);
-
-    switch (style) {
-      case _ArtworkStyle.mountain:
-        _paintMountain(canvas, size);
-        break;
-      case _ArtworkStyle.wave:
-        _paintWave(canvas, size);
-        break;
-      case _ArtworkStyle.heart:
-        _paintHeart(canvas, size);
-        break;
-      case _ArtworkStyle.portraitLeft:
-      case _ArtworkStyle.portraitCenter:
-      case _ArtworkStyle.portraitRight:
-      case _ArtworkStyle.portraitFemale:
-      case _ArtworkStyle.portraitShadow:
-      case _ArtworkStyle.portraitSoft:
-        _paintPortrait(canvas, size, style);
-        break;
-      case _ArtworkStyle.letterB:
-        _paintGlyph(canvas, size, 'b');
-        break;
-      case _ArtworkStyle.numberSeven:
-        _paintGlyph(canvas, size, '7');
-        break;
-      case _ArtworkStyle.numberNine:
-        _paintGlyph(canvas, size, '9');
-        break;
-    }
-  }
-
-  void _paintMountain(Canvas canvas, Size size) {
-    final glow = Paint()
-      ..shader = const LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [Color(0x0FFFFFFF), Color(0x00000000)],
-      ).createShader(Offset.zero & size);
-    canvas.drawRect(Offset.zero & size, glow);
-
-    final paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.2
-      ..color = Colors.white.withValues(alpha: 0.78);
-
-    final path = Path()
-      ..moveTo(size.width * 0.08, size.height * 0.65)
-      ..quadraticBezierTo(
-        size.width * 0.28,
-        size.height * 0.64,
-        size.width * 0.44,
-        size.height * 0.40,
-      )
-      ..quadraticBezierTo(
-        size.width * 0.48,
-        size.height * 0.30,
-        size.width * 0.58,
-        size.height * 0.15,
-      )
-      ..quadraticBezierTo(
-        size.width * 0.65,
-        size.height * 0.34,
-        size.width * 0.82,
-        size.height * 0.62,
-      );
-    canvas.drawPath(path, paint);
-
-    final echo = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 0.8
-      ..color = Colors.white.withValues(alpha: 0.18);
-
-    for (var i = 0; i < 2; i++) {
-      final shift = (i + 1) * 8.0;
-      final p = Path()
-        ..moveTo(size.width * 0.08, size.height * 0.65 + shift)
-        ..quadraticBezierTo(
-          size.width * 0.28,
-          size.height * 0.64 + shift,
-          size.width * 0.44,
-          size.height * 0.40 + shift,
-        )
-        ..quadraticBezierTo(
-          size.width * 0.48,
-          size.height * 0.30 + shift,
-          size.width * 0.58,
-          size.height * 0.15 + shift,
-        )
-        ..quadraticBezierTo(
-          size.width * 0.65,
-          size.height * 0.34 + shift,
-          size.width * 0.82,
-          size.height * 0.62 + shift,
-        );
-      canvas.drawPath(p, echo);
-    }
-  }
-
-  void _paintWave(Canvas canvas, Size size) {
-    final path = Path();
-    const segments = 48;
-    for (var i = 0; i <= segments; i++) {
-      final x = size.width * i / segments;
-      final y = size.height * 0.60 +
-          math.sin(i / segments * math.pi * 2.2) * size.height * 0.11;
-      if (i == 0) {
-        path.moveTo(x, y);
-      } else {
-        path.lineTo(x, y);
-      }
-    }
-
-    for (var i = 0; i < 12; i++) {
-      final paint = Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.2 + (i * 0.26)
-        ..color = Colors.white.withValues(alpha: 0.03 + i * 0.015)
-        ..strokeCap = StrokeCap.round;
-      canvas.drawPath(path.shift(Offset(0, i * 0.8)), paint);
-    }
-  }
-
-  void _paintHeart(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2 + 12);
-    final base = Path();
-    base.moveTo(center.dx, center.dy + 54);
-    base.cubicTo(
-      center.dx - 96,
-      center.dy - 18,
-      center.dx - 82,
-      center.dy - 120,
-      center.dx,
-      center.dy - 42,
-    );
-    base.cubicTo(
-      center.dx + 82,
-      center.dy - 120,
-      center.dx + 96,
-      center.dy - 18,
-      center.dx,
-      center.dy + 54,
-    );
-
-    for (var i = 0; i < 10; i++) {
-      final paint = Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.0 + i * 0.45
-        ..color = Colors.white.withValues(alpha: 0.05 + i * 0.03)
-        ..strokeCap = StrokeCap.round;
-      canvas.drawPath(base.shift(Offset(i * 0.4, i * 0.9)), paint);
-    }
-  }
-
-  void _paintPortrait(Canvas canvas, Size size, _ArtworkStyle style) {
-    final base = Paint()..color = const Color(0xFFE7E4DC);
-    canvas.drawRect(Offset.zero & size, base);
-
-    final shadow = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [
-          Colors.black.withValues(alpha: 0.02),
-          Colors.black.withValues(alpha: 0.18),
-        ],
-      ).createShader(Offset.zero & size);
-    canvas.drawRect(Offset.zero & size, shadow);
-
-    final stroke = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.4
-      ..color = const Color(0xFF4B4B4B);
-
-    final fill = Paint()..color = const Color(0xFFB5B2AA);
-    final head = Rect.fromCenter(
-      center: Offset(size.width * 0.5, size.height * 0.38),
-      width: size.width * 0.38,
-      height: size.height * 0.46,
-    );
-    canvas.drawOval(head, fill);
-    canvas.drawOval(head, stroke);
-
-    final body = Path()
-      ..moveTo(size.width * 0.28, size.height * 0.98)
-      ..quadraticBezierTo(
-        size.width * 0.50,
-        size.height * 0.70,
-        size.width * 0.72,
-        size.height * 0.98,
-      );
-    canvas.drawPath(body, stroke);
-
-    final eyeY = size.height * 0.36;
-    canvas.drawLine(
-      Offset(size.width * 0.40, eyeY),
-      Offset(size.width * 0.47, eyeY),
-      stroke,
-    );
-    canvas.drawLine(
-      Offset(size.width * 0.53, eyeY),
-      Offset(size.width * 0.60, eyeY),
-      stroke,
-    );
-    canvas.drawLine(
-      Offset(size.width * 0.47, size.height * 0.53),
-      Offset(size.width * 0.53, size.height * 0.53),
-      stroke,
-    );
-
-    if (style == _ArtworkStyle.portraitShadow ||
-        style == _ArtworkStyle.portraitCenter) {
-      final beard = Paint()..color = const Color(0xFF68645E);
-      canvas.drawOval(
-        Rect.fromCenter(
-          center: Offset(size.width * 0.5, size.height * 0.50),
-          width: size.width * 0.24,
-          height: size.height * 0.17,
-        ),
-        beard,
-      );
-    }
-
-    if (style == _ArtworkStyle.portraitFemale ||
-        style == _ArtworkStyle.portraitSoft) {
-      final hair = Paint()..color = const Color(0xFF7C766E);
-      final hairPath = Path()
-        ..moveTo(size.width * 0.30, size.height * 0.18)
-        ..quadraticBezierTo(
-          size.width * 0.20,
-          size.height * 0.45,
-          size.width * 0.30,
-          size.height * 0.74,
-        )
-        ..lineTo(size.width * 0.70, size.height * 0.74)
-        ..quadraticBezierTo(
-          size.width * 0.80,
-          size.height * 0.45,
-          size.width * 0.70,
-          size.height * 0.18,
-        )
-        ..close();
-      canvas.drawPath(hairPath, hair);
-      canvas.drawPath(hairPath, stroke);
-    }
-  }
-
-  void _paintGlyph(Canvas canvas, Size size, String char) {
-    if (size.isEmpty) return;
-    final paint = TextPainter(
-      text: TextSpan(
-        text: char,
-        style: TextStyle(
-          color: Colors.black.withValues(alpha: 0.72),
-          fontSize: size.height * 0.82,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-      textDirection: TextDirection.ltr,
-    )..layout();
-
-    canvas.drawRect(
-      Offset.zero & size,
-      Paint()..color = const Color(0xFFE8E5DE),
-    );
-    paint.paint(
-      canvas,
-      Offset(
-        (size.width - paint.width) / 2,
-        (size.height - paint.height) / 2 - 4,
-      ),
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
